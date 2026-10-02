@@ -17,36 +17,36 @@ export const SyllabusView: React.FC = () => {
   return (
     <div className="space-y-4">
       {/* Course Header Banner */}
-      <div className="bg-white rounded-2xl border border-slate-200/90 p-4">
+      <div className="bg-white dark:bg-slate-850/90 dark:bg-slate-800/80 rounded-2xl border border-slate-200/90 dark:border-slate-700/80 p-4 transition-colors">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <span className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider block">
+            <span className="text-[11px] font-bold text-emerald-800 dark:text-emerald-400 uppercase tracking-wider block">
               Silabus & Rencana Pembelajaran Semester (RPS)
             </span>
-            <h2 className="text-base sm:text-lg font-bold text-slate-900 mt-0.5">
+            <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white mt-0.5">
               16 Pertemuan Pemrograman Web
             </h2>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
               {COURSE_INFO.prodi} · {COURSE_INFO.kampus} · {COURSE_INFO.sks} SKS
             </p>
           </div>
           <div className="text-right shrink-0">
-            <span className="text-2xl font-bold font-mono text-emerald-700">
+            <span className="text-2xl font-bold font-mono text-emerald-700 dark:text-emerald-400">
               {completedCount}
-              <span className="text-sm font-normal text-slate-400">/16</span>
+              <span className="text-sm font-normal text-slate-400 dark:text-slate-500">/16</span>
             </span>
-            <span className="block text-[10px] text-slate-500">Pertemuan Selesai</span>
+            <span className="block text-[10px] text-slate-500 dark:text-slate-400">Pertemuan Selesai</span>
           </div>
         </div>
 
-        {/* Filter Segmented Control (allowed by constitution) */}
-        <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-xl mt-4 overflow-x-auto">
+        {/* Filter Segmented Control */}
+        <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-900/60 rounded-xl mt-4 overflow-x-auto">
           <button
             onClick={() => setFilter('all')}
             className={`flex-1 py-1.5 px-2.5 text-xs font-medium rounded-lg transition whitespace-nowrap ${
               filter === 'all'
-                ? 'bg-white text-slate-900 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
             Semua ({SYLLABUS_DATA.length})
@@ -55,8 +55,8 @@ export const SyllabusView: React.FC = () => {
             onClick={() => setFilter('completed')}
             className={`flex-1 py-1.5 px-2.5 text-xs font-medium rounded-lg transition whitespace-nowrap ${
               filter === 'completed'
-                ? 'bg-white text-emerald-800 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white dark:bg-slate-700 text-emerald-800 dark:text-emerald-400 shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
             Selesai ({completedCount})
@@ -65,8 +65,8 @@ export const SyllabusView: React.FC = () => {
             onClick={() => setFilter('in-progress')}
             className={`flex-1 py-1.5 px-2.5 text-xs font-medium rounded-lg transition whitespace-nowrap ${
               filter === 'in-progress'
-                ? 'bg-white text-amber-800 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white dark:bg-slate-700 text-amber-800 dark:text-amber-400 shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
             Sedang Berjalan
@@ -75,8 +75,8 @@ export const SyllabusView: React.FC = () => {
             onClick={() => setFilter('upcoming')}
             className={`flex-1 py-1.5 px-2.5 text-xs font-medium rounded-lg transition whitespace-nowrap ${
               filter === 'upcoming'
-                ? 'bg-white text-slate-900 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
             Mendatang
@@ -93,26 +93,26 @@ export const SyllabusView: React.FC = () => {
           return (
             <div
               key={item.meeting}
-              className={`bg-white rounded-2xl border transition-all ${
+              className={`bg-white dark:bg-slate-850/90 dark:bg-slate-800/80 rounded-2xl border transition-all ${
                 item.status === 'in-progress'
-                  ? 'border-emerald-400 ring-1 ring-emerald-200'
-                  : 'border-slate-200/90'
+                  ? 'border-emerald-400 dark:border-emerald-500/80 ring-1 ring-emerald-200 dark:ring-emerald-900/50'
+                  : 'border-slate-200/90 dark:border-slate-700/80'
               } overflow-hidden`}
             >
               <button
                 type="button"
                 onClick={() => setExpandedMeeting(isExpanded ? null : item.meeting)}
-                className="w-full text-left p-4 flex items-center justify-between gap-3 hover:bg-slate-50/80 transition"
+                className="w-full text-left p-4 flex items-center justify-between gap-3 hover:bg-slate-50/80 dark:hover:bg-slate-700/40 transition"
               >
                 <div className="flex items-start gap-3">
                   {/* Meeting Number Circle */}
                   <div
                     className={`w-9 h-9 rounded-xl flex items-center justify-center font-mono font-bold text-xs shrink-0 ${
                       item.status === 'completed'
-                        ? 'bg-emerald-100 text-emerald-800'
+                        ? 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300'
                         : item.status === 'in-progress'
-                        ? 'bg-amber-100 text-amber-900 ring-2 ring-amber-300'
-                        : 'bg-slate-100 text-slate-600'
+                        ? 'bg-amber-100 dark:bg-amber-950/80 text-amber-900 dark:text-amber-300 ring-2 ring-amber-300 dark:ring-amber-600/60'
+                        : 'bg-slate-100 dark:bg-slate-700/80 text-slate-600 dark:text-slate-300'
                     }`}
                   >
                     {item.meeting < 10 ? `0${item.meeting}` : item.meeting}
@@ -120,71 +120,61 @@ export const SyllabusView: React.FC = () => {
 
                   <div>
                     {/* Zero-Pill Metadata */}
-                    <div className="flex items-center gap-1.5 text-xs text-slate-500 mb-0.5">
+                    <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 mb-0.5">
                       <span>{item.dateSchedule}</span>
-                      <span aria-hidden="true">·</span>
-                      <span>{item.category}</span>
+                      <span aria-hidden="true" className="text-slate-300 dark:text-slate-600">·</span>
+                      <span className="text-slate-600 dark:text-slate-300">{item.category}</span>
                       {item.status === 'in-progress' && (
                         <>
-                          <span aria-hidden="true">·</span>
-                          <span className="font-semibold text-amber-600">Minggu Ini</span>
+                          <span aria-hidden="true" className="text-slate-300 dark:text-slate-600">·</span>
+                          <span className="font-semibold text-amber-600 dark:text-amber-400">Minggu Ini</span>
                         </>
                       )}
                     </div>
 
-                    <h3 className={`text-sm sm:text-base font-bold text-slate-900 ${isUtsOrUas ? 'text-emerald-900' : ''}`}>
+                    <h3 className={`text-sm sm:text-base font-bold text-slate-900 dark:text-white ${isUtsOrUas ? 'text-emerald-900 dark:text-emerald-400' : ''}`}>
                       {item.title}
                     </h3>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0">
-                  {item.status === 'completed' && (
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 hidden xs:block" />
-                  )}
+                <div className="text-slate-400 dark:text-slate-500 shrink-0">
                   {isExpanded ? (
-                    <ChevronUp className="w-4 h-4 text-slate-400" />
+                    <ChevronUp className="w-4 h-4" />
                   ) : (
-                    <ChevronDown className="w-4 h-4 text-slate-400" />
+                    <ChevronDown className="w-4 h-4" />
                   )}
                 </div>
               </button>
 
-              {/* Collapsible Details */}
+              {/* Collapsible Content */}
               {isExpanded && (
-                <div className="px-4 pb-4 pt-1 border-t border-slate-100 space-y-3 bg-slate-50/50">
-                  <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                <div className="px-4 pb-4 pt-1 border-t border-slate-100 dark:border-slate-700/60 space-y-3 bg-slate-50/50 dark:bg-slate-900/40">
+                  <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                     {item.description}
                   </p>
 
-                  {/* CPMK */}
-                  <div className="bg-white p-3 rounded-xl border border-slate-200/80 text-xs">
-                    <span className="font-bold text-emerald-800 flex items-center gap-1.5 mb-1">
-                      <Target className="w-3.5 h-3.5" />
-                      Capaian Pembelajaran (CPMK):
-                    </span>
-                    <p className="text-slate-600">{item.cpmk}</p>
+                  {/* CPMK / Competence Target */}
+                  <div className="flex items-start gap-2 text-xs text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800/80 p-3 rounded-xl border border-slate-200/80 dark:border-slate-700/80">
+                    <Target className="w-4 h-4 text-emerald-700 dark:text-emerald-400 shrink-0 mt-0.5" />
+                    <div>
+                      <span className="font-semibold text-slate-900 dark:text-white block text-[11px] uppercase tracking-wider">
+                        Capaian Pembelajaran (CPMK):
+                      </span>
+                      <span className="text-slate-600 dark:text-slate-300">{item.cpmk}</span>
+                    </div>
                   </div>
 
-                  {/* Materials */}
-                  <div className="space-y-1.5">
-                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
-                      Materi & Lembar Praktikum:
-                    </span>
-                    <ul className="space-y-1">
-                      {item.materials.map((m, mIdx) => (
-                        <li key={mIdx} className="text-xs text-slate-700 flex items-center gap-2">
-                          <FileText className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                          <span>{m}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* Practical Task if any */}
+                  {/* Practical Task & Deliverable */}
                   {item.practicalTask && (
-                    <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-200/70 text-xs text-amber-900">
-                      <strong>Tugas Praktikum:</strong> {item.practicalTask}
+                    <div className="flex items-start gap-2 text-xs text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800/80 p-3 rounded-xl border border-slate-200/80 dark:border-slate-700/80">
+                      <FileText className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                      <div>
+                        <span className="font-semibold text-slate-900 dark:text-white block text-[11px] uppercase tracking-wider">
+                          Output Praktikum Lab:
+                        </span>
+                        <span className="text-slate-600 dark:text-slate-300">{item.practicalTask}</span>
+                      </div>
                     </div>
                   )}
                 </div>

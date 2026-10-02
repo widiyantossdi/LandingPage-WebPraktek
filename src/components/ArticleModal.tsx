@@ -49,25 +49,25 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-slate-900/60 backdrop-blur-xs overflow-hidden">
+    <div className="fixed inset-0 z-50 flex flex-col bg-slate-950/70 backdrop-blur-xs overflow-hidden">
       {/* Container */}
-      <div className="relative w-full h-full max-w-2xl mx-auto bg-white flex flex-col shadow-2xl md:my-auto md:h-[94vh] md:rounded-3xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      <div className="relative w-full h-full max-w-2xl mx-auto bg-white dark:bg-slate-900 flex flex-col shadow-2xl md:my-auto md:h-[94vh] md:rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden animate-in fade-in zoom-in-95 duration-150 transition-colors">
         
         {/* Top Header Bar */}
-        <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-slate-200/90 px-4 py-3 flex items-center justify-between">
+        <div className="sticky top-0 z-20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/90 dark:border-slate-800 px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <button
               onClick={onClose}
-              className="min-h-[44px] min-w-[44px] -ml-2 rounded-xl flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition"
+              className="min-h-[44px] min-w-[44px] -ml-2 rounded-xl flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
               aria-label="Tutup materi"
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div className="text-left">
-              <span className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider block">
+              <span className="text-[11px] font-bold text-emerald-800 dark:text-emerald-400 uppercase tracking-wider block">
                 Pertemuan {article.meetingNumber} · {article.category}
               </span>
-              <span className="text-xs text-slate-500">
+              <span className="text-xs text-slate-500 dark:text-slate-400">
                 {article.readingTime} · {article.publishedDate}
               </span>
             </div>
@@ -76,11 +76,11 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({
           <div className="flex items-center gap-1">
             <button
               onClick={handleShare}
-              className="min-h-[40px] min-w-[40px] rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition flex items-center justify-center"
+              className="min-h-[40px] min-w-[40px] rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition flex items-center justify-center"
               title="Bagikan materi"
             >
               {copyShareStatus ? (
-                <Check className="w-4 h-4 text-emerald-600" />
+                <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               ) : (
                 <Share2 className="w-4 h-4" />
               )}
@@ -90,17 +90,17 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({
               onClick={() => onToggleBookmark(article.id)}
               className={`min-h-[40px] min-w-[40px] rounded-lg transition flex items-center justify-center ${
                 isBookmarked
-                  ? 'text-amber-600 bg-amber-50'
-                  : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
+                  ? 'text-amber-600 bg-amber-50 dark:bg-amber-950/40 dark:text-amber-400'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
               title="Bookmark artikel"
             >
-              <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-amber-500' : ''}`} />
+              <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-amber-500 text-amber-500' : ''}`} />
             </button>
 
             <button
               onClick={onClose}
-              className="min-h-[40px] min-w-[40px] rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition flex items-center justify-center"
+              className="min-h-[40px] min-w-[40px] rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition flex items-center justify-center"
               aria-label="Tutup"
             >
               <X className="w-5 h-5" />
@@ -112,29 +112,29 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({
         <div className="flex-1 overflow-y-auto px-5 py-6 space-y-6">
           {/* Title & Excerpt */}
           <div className="space-y-3">
-            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 leading-tight">
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white leading-tight">
               {article.title}
             </h1>
-            <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-normal">
+            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
               {article.excerpt}
             </p>
-            <div className="flex items-center gap-2 pt-1 text-xs text-slate-500 border-b border-slate-100 pb-3">
-              <span>Pengampu: <strong className="text-slate-800">{article.author}</strong></span>
+            <div className="flex items-center gap-2 pt-1 text-xs text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-3">
+              <span>Pengampu: <strong className="text-slate-800 dark:text-slate-200">{article.author}</strong></span>
               <span aria-hidden="true">·</span>
               <span>Prodi Sistem Informasi UNUGHA</span>
             </div>
           </div>
 
           {/* Key Takeaways Box */}
-          <div className="bg-emerald-50/70 border border-emerald-200/80 rounded-2xl p-4">
-            <h2 className="text-xs font-bold text-emerald-900 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-              <Lightbulb className="w-4 h-4 text-emerald-700" />
+          <div className="bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800/80 rounded-2xl p-4">
+            <h2 className="text-xs font-bold text-emerald-900 dark:text-emerald-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+              <Lightbulb className="w-4 h-4 text-emerald-700 dark:text-emerald-400" />
               Poin Kunci Pembelajaran
             </h2>
-            <ul className="space-y-1.5 text-xs sm:text-sm text-emerald-950">
+            <ul className="space-y-1.5 text-xs sm:text-sm text-emerald-950 dark:text-emerald-200">
               {article.keyTakeaways.map((point, idx) => (
                 <li key={idx} className="flex items-start gap-2">
-                  <span className="text-emerald-600 font-bold shrink-0">✓</span>
+                  <span className="text-emerald-600 dark:text-emerald-400 font-bold shrink-0">✓</span>
                   <span>{point}</span>
                 </li>
               ))}
@@ -145,18 +145,18 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({
           <div className="space-y-8">
             {article.sections.map((section, sIdx) => (
               <section key={sIdx} className="space-y-3">
-                <h3 className="text-base sm:text-lg font-bold text-slate-900">
+                <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
                   {section.heading}
                 </h3>
-                <p className="text-sm sm:text-base text-slate-700 leading-relaxed whitespace-pre-line">
+                <p className="text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line">
                   {section.body}
                 </p>
 
                 {section.bulletPoints && (
                   <ul className="space-y-2 pl-2">
                     {section.bulletPoints.map((b, bIdx) => (
-                      <li key={bIdx} className="text-xs sm:text-sm text-slate-700 flex items-start gap-2">
-                        <span className="text-emerald-700 font-bold shrink-0 mt-0.5">•</span>
+                      <li key={bIdx} className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 flex items-start gap-2">
+                        <span className="text-emerald-700 dark:text-emerald-400 font-bold shrink-0 mt-0.5">•</span>
                         <span>{b}</span>
                       </li>
                     ))}
@@ -200,7 +200,7 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({
 
                 {/* Tips Callout */}
                 {section.tips && (
-                  <div className="bg-amber-50/70 border-l-4 border-amber-500 rounded-r-xl p-3 text-xs sm:text-sm text-amber-950 flex items-start gap-2">
+                  <div className="bg-amber-50/70 dark:bg-amber-950/40 border-l-4 border-amber-500 rounded-r-xl p-3 text-xs sm:text-sm text-amber-950 dark:text-amber-200 flex items-start gap-2">
                     <span className="font-bold shrink-0">💡 Catatan Dosen:</span>
                     <span>{section.tips}</span>
                   </div>
@@ -234,12 +234,12 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({
         </div>
 
         {/* Sticky Bottom Actions Bar */}
-        <div className="sticky bottom-0 z-20 bg-white/95 backdrop-blur-md border-t border-slate-200 px-4 py-3 flex items-center justify-between gap-3">
+        <div className="sticky bottom-0 z-20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between gap-3">
           <button
             onClick={() => onToggleComplete(article.id)}
             className={`flex-1 min-h-[46px] rounded-xl font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition active:scale-[0.98] ${
               isCompleted
-                ? 'bg-emerald-100 text-emerald-900 hover:bg-emerald-200'
+                ? 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-900 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900'
                 : 'bg-emerald-700 text-white hover:bg-emerald-800 shadow-sm'
             }`}
           >
