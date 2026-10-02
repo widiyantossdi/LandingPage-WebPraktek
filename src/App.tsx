@@ -10,7 +10,12 @@ import {
   GraduationCap,
   Brain,
   Sliders,
-  FileCode
+  FileCode,
+  Zap,
+  Flame,
+  Timer,
+  Trophy,
+  ArrowRight
 } from 'lucide-react';
 import { Header } from './components/Header';
 import { BottomNav, TabType } from './components/BottomNav';
@@ -26,7 +31,9 @@ import { Toast, ToastData } from './components/Toast';
 import { VisualLayoutLab } from './components/VisualLayoutLab';
 import { FlashcardsView } from './components/FlashcardsView';
 import { CodeRecipesView } from './components/CodeRecipesView';
+import { DailyChallengeModal } from './components/DailyChallengeModal';
 import { ARTICLES_DATA, COURSE_INFO, ASSIGNMENTS_DATA } from './data/courseData';
+import { DAILY_CHALLENGES_DATA } from './data/dailyChallengesData';
 import { Article } from './types/course';
 
 export default function App() {
@@ -37,8 +44,48 @@ export default function App() {
   const [showOnlyBookmarked, setShowOnlyBookmarked] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
   const [isQuizOpen, setIsQuizOpen] = useState(false);
+  const [isChallengeOpen, setIsChallengeOpen] = useState(false);
   const [isMobileFrame, setIsMobileFrame] = useState(false);
   const [toast, setToast] = useState<ToastData | null>(null);
+
+  // Daily Challenge Gamification State
+  const [challengeStreak, setChallengeStreak] = useState<number>(() => {
+    try {
+      const s = localStorage.getItem('unugha_challenge_streak');
+      return s ? Number(s) : 1;
+    } catch {
+      return 1;
+    }
+  });
+
+  const [challengePoints, setChallengePoints] = useState<number>(() => {
+    try {
+      const p = localStorage.getItem('unugha_challenge_points');
+      return p ? Number(p) : 120;
+    } catch {
+      return 120;
+    }
+  });
+
+  const handleChallengeSuccess = (score: number, challengeTitle: string) => {
+    const newStreak = challengeStreak + 1;
+    const newPoints = challengePoints + score;
+    setChallengeStreak(newStreak);
+    setChallengePoints(newPoints);
+    try {
+      localStorage.setItem('unugha_challenge_streak', String(newStreak));
+      localStorage.setItem('unugha_challenge_points', String(newPoints));
+    } catch {
+      // ignore
+    }
+    showToast({
+      type: 'complete',
+      title: 'Tantangan Hari Ini Dituntaskan! ⚡',
+      message: `+${score} XP berhasil diraih untuk "${challengeTitle}". Streak Anda: ${newStreak} Hari 🔥`
+    });
+  };
+
+  const todayChallenge = DAILY_CHALLENGES_DATA[new Date().getDate() % DAILY_CHALLENGES_DATA.length];
 
   // Global Dark Mode state with localStorage persistence
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
@@ -215,13 +262,15 @@ export default function App() {
             : 'max-w-2xl mx-auto shadow-sm border-x border-slate-200/80 dark:border-slate-800'
         }`}
       >
-        {/* Top App Bar with Dark Mode Toggle */}
+        {/* Top App Bar with Dark Mode Toggle & Tantangan Button */}
         <Header
           completedArticlesCount={completedIds.length}
           totalArticlesCount={ARTICLES_DATA.length}
           isMobileFrame={isMobileFrame}
           setIsMobileFrame={setIsMobileFrame}
           onOpenQuiz={() => setIsQuizOpen(true)}
+          onOpenChallenge={() => setIsChallengeOpen(true)}
+          streakCount={challengeStreak}
           isDarkMode={isDarkMode}
           toggleDarkMode={toggleDarkMode}
         />
@@ -245,7 +294,7 @@ export default function App() {
                   Mata Kuliah Pemrograman Web
                 </h2>
                 <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-                  Modul belajar mandiri, laboratorium layout interaktif, kartu hafalan konsep, dan resep kode siap pakai untuk mahasiswa semester berjalan.
+                  Modul belajar mandiri, tantangan koding harian, laboratorium layout interaktif, kartu kilat konsep, dan resep kode siap pakai.
                 </p>
 
                 {/* Quick stats unboxed */}
@@ -259,6 +308,57 @@ export default function App() {
                     className="font-bold underline hover:text-white"
                   >
                     Deploy Pages →
+                  </button>
+                </div>
+              </div>
+
+              {/* Daily Challenge Interactive Banner */}
+              <div className="bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-amber-500/5 dark:from-amber-950/40 dark:via-orange-950/30 dark:to-slate-900 border border-amber-300/80 dark:border-amber-800/80 rounded-3xl p-4 sm:p-5 relative overflow-hidden transition-all shadow-xs">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-amber-900 dark:text-amber-400 bg-amber-200/80 dark:bg-amber-900/60 px-2 py-0.5 rounded-lg">
+                        <Zap className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
+                        Tantangan Hari Ini
+                      </span>
+                      <span className="text-[11px] font-mono text-orange-800 dark:text-orange-300 font-bold flex items-center gap-1">
+                        <Flame className="w-3.5 h-3.5 fill-orange-500 text-orange-500" />
+                        Streak: {challengeStreak} Hari
+                      </span>
+                      <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400">
+                        · ⏱️ {Math.round(todayChallenge.timeLimitSeconds / 60)} Menit
+                      </span>
+                    </div>
+
+                    <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white leading-snug pt-1">
+                      {todayChallenge.title}
+                    </h3>
+                    <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed">
+                      {todayChallenge.description}
+                    </p>
+                  </div>
+
+                  <div className="text-right shrink-0">
+                    <span className="text-xs font-mono font-bold text-amber-700 dark:text-amber-400 bg-white dark:bg-slate-800 px-2.5 py-1 rounded-xl border border-amber-200 dark:border-amber-800/80 block shadow-2xs">
+                      +{todayChallenge.basePoints} XP
+                    </span>
+                    <span className="text-[10px] text-slate-400 block mt-1">+Bonus Waktu</span>
+                  </div>
+                </div>
+
+                <div className="mt-3 pt-3 border-t border-amber-200/60 dark:border-amber-800/60 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
+                    <Trophy className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                    <span>Total XP Koding Anda: <strong className="font-mono text-slate-900 dark:text-white">{challengePoints} XP</strong></span>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setIsChallengeOpen(true)}
+                    className="min-h-[38px] px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-bold text-xs flex items-center gap-1.5 transition shadow-xs active:scale-95 shrink-0"
+                  >
+                    <span>Mulai Koding</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>
@@ -513,6 +613,14 @@ export default function App() {
         <QuizModal
           isOpen={isQuizOpen}
           onClose={() => setIsQuizOpen(false)}
+        />
+
+        {/* Daily Coding Challenge Modal */}
+        <DailyChallengeModal
+          isOpen={isChallengeOpen}
+          onClose={() => setIsChallengeOpen(false)}
+          onSuccess={handleChallengeSuccess}
+          streakCount={challengeStreak}
         />
       </div>
     </div>

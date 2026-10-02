@@ -1,5 +1,5 @@
 import React from 'react';
-import { Smartphone, Monitor, Sparkles, CheckCircle2, Moon, Sun } from 'lucide-react';
+import { Smartphone, Monitor, Sparkles, CheckCircle2, Moon, Sun, Zap, Flame } from 'lucide-react';
 import { COURSE_INFO } from '../data/courseData';
 
 interface HeaderProps {
@@ -8,6 +8,8 @@ interface HeaderProps {
   isMobileFrame: boolean;
   setIsMobileFrame: (val: boolean) => void;
   onOpenQuiz: () => void;
+  onOpenChallenge?: () => void;
+  streakCount?: number;
   isDarkMode: boolean;
   toggleDarkMode: () => void;
 }
@@ -18,6 +20,8 @@ export const Header: React.FC<HeaderProps> = ({
   isMobileFrame,
   setIsMobileFrame,
   onOpenQuiz,
+  onOpenChallenge,
+  streakCount = 1,
   isDarkMode,
   toggleDarkMode
 }) => {
@@ -45,7 +49,25 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Zone 3: Actions & Ergonomic Toggles */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Tantangan Hari Ini button */}
+          {onOpenChallenge && (
+            <button
+              type="button"
+              onClick={onOpenChallenge}
+              className="min-h-[38px] px-2.5 sm:px-3 rounded-xl text-xs font-semibold text-amber-900 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 dark:hover:bg-amber-900/60 border border-amber-200/80 dark:border-amber-800/60 transition flex items-center gap-1.5 shrink-0 active:scale-95 shadow-2xs"
+              title="Tantangan Koding Hari Ini (Batas Waktu & Skor)"
+            >
+              <Zap className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
+              <span className="hidden xs:inline">Tantangan</span>
+              {streakCount > 0 && (
+                <span className="font-mono text-[10px] bg-amber-200/80 dark:bg-amber-800/80 px-1 py-0.2 rounded text-amber-950 dark:text-amber-200 font-bold">
+                  🔥{streakCount}
+                </span>
+              )}
+            </button>
+          )}
+
           {/* Dark Mode Toggle */}
           <button
             type="button"
@@ -68,19 +90,18 @@ export const Header: React.FC<HeaderProps> = ({
             title="Uji Pemahaman Web Programming"
           >
             <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-            <span className="hidden xs:inline">Kuis Kilat</span>
+            <span className="hidden sm:inline">Kuis</span>
           </button>
 
           {/* Progress Indicator */}
-          <div className="flex items-center gap-1 text-[11px] font-medium text-slate-600 dark:text-slate-300 bg-slate-100/90 dark:bg-slate-800/90 px-2.5 py-1.5 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
+          <div className="flex items-center gap-1 text-[11px] font-medium text-slate-600 dark:text-slate-300 bg-slate-100/90 dark:bg-slate-800/90 px-2 sm:px-2.5 py-1.5 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
             <span className="tabular-nums font-mono font-semibold text-slate-900 dark:text-white">
               {completedArticlesCount}/{totalArticlesCount}
             </span>
-            <span className="text-slate-400 hidden xs:inline">modul</span>
           </div>
 
-          {/* Desktop Frame Toggle (Allows testing mobile preview or fluid wide view) */}
+          {/* Desktop Frame Toggle */}
           <div className="hidden lg:flex items-center p-0.5 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
             <button
               onClick={() => setIsMobileFrame(true)}
