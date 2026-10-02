@@ -1,5 +1,17 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Search, Filter, Bookmark, Sparkles, BookOpen, ChevronRight, CheckCircle2, GraduationCap } from 'lucide-react';
+import {
+  Search,
+  Filter,
+  Bookmark,
+  Sparkles,
+  BookOpen,
+  ChevronRight,
+  CheckCircle2,
+  GraduationCap,
+  Brain,
+  Sliders,
+  FileCode
+} from 'lucide-react';
 import { Header } from './components/Header';
 import { BottomNav, TabType } from './components/BottomNav';
 import { ArticleCard } from './components/ArticleCard';
@@ -10,17 +22,23 @@ import { AssignmentView } from './components/AssignmentView';
 import { CloudflareGuideView } from './components/CloudflareGuideView';
 import { QuizModal } from './components/QuizModal';
 import { ProgressDashboard } from './components/ProgressDashboard';
+import { Toast, ToastData } from './components/Toast';
+import { VisualLayoutLab } from './components/VisualLayoutLab';
+import { FlashcardsView } from './components/FlashcardsView';
+import { CodeRecipesView } from './components/CodeRecipesView';
 import { ARTICLES_DATA, COURSE_INFO, ASSIGNMENTS_DATA } from './data/courseData';
 import { Article } from './types/course';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<TabType>('materi');
+  const [materiSubTab, setMateriSubTab] = useState<'modul' | 'kartu' | 'layout' | 'resep'>('modul');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('Semua');
   const [showOnlyBookmarked, setShowOnlyBookmarked] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
   const [isQuizOpen, setIsQuizOpen] = useState(false);
   const [isMobileFrame, setIsMobileFrame] = useState(false);
+  const [toast, setToast] = useState<ToastData | null>(null);
 
   // Global Dark Mode state with localStorage persistence
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
@@ -96,18 +114,61 @@ export default function App() {
     }
   }, [bookmarkedIds]);
 
+  const showToast = (toastData: Omit<ToastData, 'id'>) => {
+    setToast({
+      ...toastData,
+      id: String(Date.now())
+    });
+  };
+
   const toggleComplete = (id: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
-    setCompletedIds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
+    const article = ARTICLES_DATA.find((a) => a.id === id);
+    const titleSnippet = article ? article.title : 'Modul materi';
+
+    setCompletedIds((prev) => {
+      const isAlreadyCompleted = prev.includes(id);
+      if (isAlreadyCompleted) {
+        showToast({
+          type: 'uncomplete',
+          title: 'Status Modul Diperbarui',
+          message: `"${titleSnippet}" ditandai belum selesai.`
+        });
+        return prev.filter((item) => item !== id);
+      } else {
+        showToast({
+          type: 'complete',
+          title: 'Modul Berhasil Diselesaikan! 🎉',
+          message: `"${titleSnippet}" telah dicatat pada rapor progres belajar.`
+        });
+        return [...prev, id];
+      }
+    });
   };
 
   const toggleBookmark = (id: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
-    setBookmarkedIds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
+    const article = ARTICLES_DATA.find((a) => a.id === id);
+    const titleSnippet = article ? article.title : 'Materi';
+
+    setBookmarkedIds((prev) => {
+      const isAlreadyBookmarked = prev.includes(id);
+      if (isAlreadyBookmarked) {
+        showToast({
+          type: 'unbookmark',
+          title: 'Dihapus dari Bookmark',
+          message: `"${titleSnippet}" dihapus dari daftar bacaan.`
+        });
+        return prev.filter((item) => item !== id);
+      } else {
+        showToast({
+          type: 'bookmark',
+          title: 'Materi Tersimpan ke Bookmark 📌',
+          message: `"${titleSnippet}" dapat diakses cepat pada filter tersimpan.`
+        });
+        return [...prev, id];
+      }
+    });
   };
 
   const handleOpenPlaygroundFromArticle = (code: { html: string; css: string; js: string }) => {
@@ -143,6 +204,9 @@ export default function App() {
         isMobileFrame ? 'p-0 sm:py-8' : ''
       }`}
     >
+      {/* Toast Notification Container */}
+      <Toast toast={toast} onClose={() => setToast(null)} />
+
       {/* Outer Shell: Mobile Frame Mode or Fluid Mode */}
       <div
         className={`w-full bg-slate-50 dark:bg-slate-900 min-h-screen flex flex-col transition-all duration-200 ${
@@ -164,7 +228,7 @@ export default function App() {
 
         {/* Main Content Area */}
         <main className="flex-1 px-4 py-4 pb-24 overflow-y-auto">
-          {/* TAB 1: MATERI & BLOG PERKULIAHAN */}
+          {/* TAB 1: MATERI & STUDI EKSPLORATIF PERKULIAHAN */}
           {activeTab === 'materi' && (
             <div className="space-y-4">
               {/* Campus Greeting Kicker */}
@@ -181,14 +245,14 @@ export default function App() {
                   Mata Kuliah Pemrograman Web
                 </h2>
                 <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-                  Modul belajar mandiri, panduan praktikum lab komputer, dan materi terstruktur untuk mahasiswa semester berjalan.
+                  Modul belajar mandiri, laboratorium layout interaktif, kartu hafalan konsep, dan resep kode siap pakai untuk mahasiswa semester berjalan.
                 </p>
 
                 {/* Quick stats unboxed */}
                 <div className="mt-4 pt-3 border-t border-emerald-700/50 flex items-center justify-between text-xs text-emerald-100">
                   <span>{ARTICLES_DATA.length} Modul Materi</span>
                   <span aria-hidden="true">·</span>
-                  <span>16 Pertemuan</span>
+                  <span>16 Pertemuan RPS</span>
                   <span aria-hidden="true">·</span>
                   <button
                     onClick={() => setActiveTab('panduan')}
@@ -199,131 +263,212 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Semester Progress Visualization Dashboard (Radial Progress, Badges & PDF) */}
-              <ProgressDashboard
-                articles={ARTICLES_DATA}
-                completedIds={completedIds}
-                onOpenArticle={(art) => setSelectedArticle(art)}
-              />
-
-              {/* Search Bar & Bookmark Filter */}
-              <div className="flex items-center gap-2">
-                <div className="relative flex-1">
-                  <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
-                  <input
-                    type="search"
-                    placeholder="Cari materi (HTML, Flexbox, DOM, Git)..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-3 py-2.5 bg-white dark:bg-slate-850/90 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700/80 text-xs sm:text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-emerald-600 dark:focus:border-emerald-500 shadow-2xs transition-colors"
-                  />
-                </div>
+              {/* Sub-mode Segmented Tabs for Learning Studio */}
+              <div className="grid grid-cols-4 gap-1 p-1 bg-slate-200/70 dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700/80 text-xs">
+                <button
+                  type="button"
+                  onClick={() => setMateriSubTab('modul')}
+                  className={`py-2 px-1 rounded-xl font-bold flex flex-col sm:flex-row items-center justify-center gap-1.5 transition ${
+                    materiSubTab === 'modul'
+                      ? 'bg-white dark:bg-slate-700 text-emerald-800 dark:text-emerald-300 shadow-xs'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  <BookOpen className="w-3.5 h-3.5" />
+                  <span className="text-[11px] sm:text-xs">Modul RPS</span>
+                </button>
 
                 <button
                   type="button"
-                  onClick={() => setShowOnlyBookmarked(!showOnlyBookmarked)}
-                  className={`min-h-[42px] px-3 rounded-xl border text-xs font-medium flex items-center gap-1.5 transition ${
-                    showOnlyBookmarked
-                      ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-700/80 text-amber-800 dark:text-amber-300'
-                      : 'bg-white dark:bg-slate-850/90 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700/80 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60'
+                  onClick={() => setMateriSubTab('kartu')}
+                  className={`py-2 px-1 rounded-xl font-bold flex flex-col sm:flex-row items-center justify-center gap-1.5 transition ${
+                    materiSubTab === 'kartu'
+                      ? 'bg-white dark:bg-slate-700 text-amber-700 dark:text-amber-300 shadow-xs'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                   }`}
-                  title="Tampilkan hanya materi yang disimpan"
                 >
-                  <Bookmark
-                    className={`w-3.5 h-3.5 ${showOnlyBookmarked ? 'fill-amber-500 text-amber-500' : ''}`}
-                  />
-                  <span className="hidden xs:inline">Tersimpan</span>
+                  <Brain className="w-3.5 h-3.5 text-amber-500" />
+                  <span className="text-[11px] sm:text-xs">Kartu Kilat</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setMateriSubTab('layout')}
+                  className={`py-2 px-1 rounded-xl font-bold flex flex-col sm:flex-row items-center justify-center gap-1.5 transition ${
+                    materiSubTab === 'layout'
+                      ? 'bg-white dark:bg-slate-700 text-emerald-700 dark:text-emerald-300 shadow-xs'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  <Sliders className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                  <span className="text-[11px] sm:text-xs">Visual Lab</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setMateriSubTab('resep')}
+                  className={`py-2 px-1 rounded-xl font-bold flex flex-col sm:flex-row items-center justify-center gap-1.5 transition ${
+                    materiSubTab === 'resep'
+                      ? 'bg-white dark:bg-slate-700 text-blue-700 dark:text-blue-300 shadow-xs'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  <FileCode className="w-3.5 h-3.5 text-blue-500 dark:text-blue-400" />
+                  <span className="text-[11px] sm:text-xs">Resep Kode</span>
                 </button>
               </div>
 
-              {/* Category Filter Buttons (Functional segmented buttons) */}
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
-                {categories.map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setSelectedCategory(cat)}
-                    className={`min-h-[36px] px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition ${
-                      selectedCategory === cat
-                        ? 'bg-emerald-800 dark:bg-emerald-700 text-white shadow-xs'
-                        : 'bg-white dark:bg-slate-850/90 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700/80 hover:bg-slate-50 dark:hover:bg-slate-700/60'
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
+              {/* VIEW 1: MODUL & ARTIKEL */}
+              {materiSubTab === 'modul' && (
+                <div className="space-y-4 animate-in fade-in duration-200">
+                  {/* Semester Progress Visualization Dashboard (Radial Progress, Badges & PDF) */}
+                  <ProgressDashboard
+                    articles={ARTICLES_DATA}
+                    completedIds={completedIds}
+                    onOpenArticle={(art) => setSelectedArticle(art)}
+                  />
 
-              {/* Featured Card if no filter applied */}
-              {selectedCategory === 'Semua' && !searchQuery && !showOnlyBookmarked && (
-                <div
-                  onClick={() => setSelectedArticle(featuredArticle)}
-                  className="bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/90 dark:border-emerald-800/80 rounded-2xl p-4 cursor-pointer hover:border-emerald-400 dark:hover:border-emerald-600 transition group active:scale-[0.99]"
-                >
-                  <div className="flex items-center justify-between text-xs text-emerald-800 dark:text-emerald-400 mb-1">
-                    <span className="font-bold flex items-center gap-1">
-                      <Sparkles className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400" />
-                      Fokus Praktikum Pekan Ini
-                    </span>
-                    <span className="font-mono text-[11px] text-emerald-700 dark:text-emerald-400">
-                      Prt. {featuredArticle.meetingNumber}
-                    </span>
+                  {/* Search Bar & Bookmark Filter */}
+                  <div className="flex items-center gap-2">
+                    <div className="relative flex-1">
+                      <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
+                      <input
+                        type="search"
+                        placeholder="Cari materi (HTML, Flexbox, DOM, Git)..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full pl-10 pr-3 py-2.5 bg-white dark:bg-slate-850/90 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700/80 text-xs sm:text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-emerald-600 dark:focus:border-emerald-500 shadow-2xs transition-colors"
+                      />
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setShowOnlyBookmarked(!showOnlyBookmarked)}
+                      className={`min-h-[42px] px-3 rounded-xl border text-xs font-medium flex items-center gap-1.5 transition ${
+                        showOnlyBookmarked
+                          ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-700/80 text-amber-800 dark:text-amber-300'
+                          : 'bg-white dark:bg-slate-850/90 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700/80 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60'
+                      }`}
+                      title="Tampilkan hanya materi yang disimpan"
+                    >
+                      <Bookmark
+                        className={`w-3.5 h-3.5 ${showOnlyBookmarked ? 'fill-amber-500 text-amber-500' : ''}`}
+                      />
+                      <span className="hidden xs:inline">Tersimpan</span>
+                    </button>
                   </div>
-                  <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-emerald-800 dark:group-hover:text-emerald-400 transition">
-                    {featuredArticle.title}
-                  </h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 mt-1">
-                    {featuredArticle.excerpt}
-                  </p>
-                  <div className="mt-3 flex items-center justify-between text-xs font-semibold text-emerald-700 dark:text-emerald-400">
-                    <span>Baca Modul Lengkap</span>
-                    <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+
+                  {/* Category Filter Buttons */}
+                  <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+                    {categories.map((cat) => (
+                      <button
+                        key={cat}
+                        onClick={() => setSelectedCategory(cat)}
+                        className={`min-h-[36px] px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition ${
+                          selectedCategory === cat
+                            ? 'bg-emerald-800 dark:bg-emerald-700 text-white shadow-xs'
+                            : 'bg-white dark:bg-slate-850/90 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700/80 hover:bg-slate-50 dark:hover:bg-slate-700/60'
+                        }`}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Featured Card if no filter applied */}
+                  {selectedCategory === 'Semua' && !searchQuery && !showOnlyBookmarked && (
+                    <div
+                      onClick={() => setSelectedArticle(featuredArticle)}
+                      className="bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/90 dark:border-emerald-800/80 rounded-2xl p-4 cursor-pointer hover:border-emerald-400 dark:hover:border-emerald-600 transition group active:scale-[0.99]"
+                    >
+                      <div className="flex items-center justify-between text-xs text-emerald-800 dark:text-emerald-400 mb-1">
+                        <span className="font-bold flex items-center gap-1">
+                          <Sparkles className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400" />
+                          Fokus Praktikum Pekan Ini
+                        </span>
+                        <span className="font-mono text-[11px] text-emerald-700 dark:text-emerald-400">
+                          Prt. {featuredArticle.meetingNumber}
+                        </span>
+                      </div>
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-emerald-800 dark:group-hover:text-emerald-400 transition">
+                        {featuredArticle.title}
+                      </h3>
+                      <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 mt-1">
+                        {featuredArticle.excerpt}
+                      </p>
+                      <div className="mt-3 flex items-center justify-between text-xs font-semibold text-emerald-700 dark:text-emerald-400">
+                        <span>Baca Modul Lengkap</span>
+                        <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Articles Grid / List */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 px-1">
+                      <span>Daftar Artikel Pembelajaran ({filteredArticles.length})</span>
+                      {showOnlyBookmarked && (
+                        <span className="text-amber-700 dark:text-amber-400 font-medium">Filter: Disimpan</span>
+                      )}
+                    </div>
+
+                    {filteredArticles.length > 0 ? (
+                      filteredArticles.map((article) => (
+                        <ArticleCard
+                          key={article.id}
+                          article={article}
+                          isCompleted={completedIds.includes(article.id)}
+                          isBookmarked={bookmarkedIds.includes(article.id)}
+                          onToggleComplete={toggleComplete}
+                          onToggleBookmark={toggleBookmark}
+                          onOpenArticle={(art) => setSelectedArticle(art)}
+                        />
+                      ))
+                    ) : (
+                      <div className="text-center py-12 bg-white dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700/80 p-6 space-y-2">
+                        <BookOpen className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto" />
+                        <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                          Materi tidak ditemukan
+                        </p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                          Coba ganti kata kunci pencarian atau reset filter kategori.
+                        </p>
+                        <button
+                          onClick={() => {
+                            setSearchQuery('');
+                            setSelectedCategory('Semua');
+                            setShowOnlyBookmarked(false);
+                          }}
+                          className="mt-2 text-xs font-bold text-emerald-700 dark:text-emerald-400 underline"
+                        >
+                          Reset Filter
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
 
-              {/* Articles Grid / List */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 px-1">
-                  <span>Daftar Artikel Pembelajaran ({filteredArticles.length})</span>
-                  {showOnlyBookmarked && (
-                    <span className="text-amber-700 dark:text-amber-400 font-medium">Filter: Disimpan</span>
-                  )}
+              {/* VIEW 2: KARTU KILAT (FLASHCARDS ACTIVE RECALL) */}
+              {materiSubTab === 'kartu' && (
+                <div className="animate-in fade-in duration-200">
+                  <FlashcardsView />
                 </div>
+              )}
 
-                {filteredArticles.length > 0 ? (
-                  filteredArticles.map((article) => (
-                    <ArticleCard
-                      key={article.id}
-                      article={article}
-                      isCompleted={completedIds.includes(article.id)}
-                      isBookmarked={bookmarkedIds.includes(article.id)}
-                      onToggleComplete={toggleComplete}
-                      onToggleBookmark={toggleBookmark}
-                      onOpenArticle={(art) => setSelectedArticle(art)}
-                    />
-                  ))
-                ) : (
-                  <div className="text-center py-12 bg-white dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700/80 p-6 space-y-2">
-                    <BookOpen className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto" />
-                    <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
-                      Materi tidak ditemukan
-                    </p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      Coba ganti kata kunci pencarian atau reset filter kategori.
-                    </p>
-                    <button
-                      onClick={() => {
-                        setSearchQuery('');
-                        setSelectedCategory('Semua');
-                        setShowOnlyBookmarked(false);
-                      }}
-                      className="mt-2 text-xs font-bold text-emerald-700 dark:text-emerald-400 underline"
-                    >
-                      Reset Filter
-                    </button>
-                  </div>
-                )}
-              </div>
+              {/* VIEW 3: VISUAL LAYOUT STUDIO (FLEXBOX & GRID) */}
+              {materiSubTab === 'layout' && (
+                <div className="animate-in fade-in duration-200">
+                  <VisualLayoutLab onSendToLab={handleOpenPlaygroundFromArticle} />
+                </div>
+              )}
+
+              {/* VIEW 4: RESEP KODE POPULER (COOKBOOK) */}
+              {materiSubTab === 'resep' && (
+                <div className="animate-in fade-in duration-200">
+                  <CodeRecipesView onSendToLab={handleOpenPlaygroundFromArticle} />
+                </div>
+              )}
             </div>
           )}
 
