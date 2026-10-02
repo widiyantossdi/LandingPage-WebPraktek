@@ -1,0 +1,6 @@
+{
+  "name": "Web Programming SI UNUGHA",
+  "description": "Portal belajar dan blog mata kuliah Pemrograman Web untuk mahasiswa Sistem Informasi UNUGHA Cilacap dengan panduan deployment Cloudflare Pages.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
